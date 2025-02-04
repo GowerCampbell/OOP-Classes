@@ -1,6 +1,6 @@
 # **1. Class Definition: `SmartDevice`**
 
-The class `SmartDevice` models smart devices with attributes like name, type, location, wattage, power status, and an automatically generated device ID. It provides several methods to interact with these devices and track their status.
+The class `SmartDevice` models smart devices with attributes like name, type, location, wattage, power status, and an automatically generated device ID. It provides several methods to interact with these devices and track their status. [Python File Here](smart-device-management.py)
 
 ---
 
