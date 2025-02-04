@@ -187,8 +187,6 @@ One of the challenges I faced was ensuring robust input validation and error han
 
 The export/import feature was particularly rewarding to implement. It demonstrates how data persistence can be achieved using JSON files, which are both human-readable and widely supported. This feature makes the system more practical for real-world use.
 
-Overall, this project deepened my understanding of OOP, file handling, and error management in Python. It also highlighted the importance of designing systems with scalability and usability in mind.
-
 ---
 
 ## Bibliography
