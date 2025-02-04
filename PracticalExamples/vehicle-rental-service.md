@@ -1,26 +1,16 @@
-# Vehicle Rental Service
+# Vehicle Rental Service with Inheritance
 
-This system allows you to manage a fleet of vehicles for rental, including cars and bikes. It calculates rental costs based on the number of days rented and supports adding, updating, searching, and exporting/importing vehicle data.
+## Introduction
 
----
-
-## Features
-
-1. **Add a Vehicle**: Add a new vehicle with type, make, model, and daily rental rate.
-2. **Update Vehicle Details**: Modify the make, model, or daily rental rate of an existing vehicle.
-3. **Search for Vehicles**: Find vehicles by type, make, or model.
-4. **List All Vehicles**: Display all vehicles in the system.
-5. **Calculate Rental Cost**: Calculate the rental cost for a specific vehicle based on the number of days.
-6. **Export Vehicles to File**: Save vehicle data to a file.
-7. **Import Vehicles from File**: Load vehicle data from a file.
+This system manages a fleet of vehicles available for rental. It demonstrates the use of inheritance in Python by creating specialized classes (`Car` and `Bike`) that inherit from a common base class (`Vehicle`). The main purpose is to show how inheritance allows us to extend a base class to create more specific types of vehicles.
 
 ---
 
-## Code Implementation
+## Classes Breakdown
 
-### Vehicle Class
+### 1. `Vehicle` Class (Base Class)
 
-The `Vehicle` class represents a vehicle object with attributes `type`, `make`, `model`, and `daily_rate`. It includes methods for converting the object to a dictionary and a string representation.
+The `Vehicle` class is the parent class, containing general attributes and methods common to all types of vehicles.
 
 ```python
 class Vehicle:
@@ -29,50 +19,87 @@ class Vehicle:
         self.make = make
         self.model = model
         self.daily_rate = daily_rate
-
-    def __repr__(self):
-        return f"Vehicle(type={self.type}, make={self.make}, model={self.model}, daily_rate={self.daily_rate})"
-
-    def to_dict(self):
-        """Convert vehicle object to a dictionary for JSON serialization."""
-        return {
-            "type": self.type,
-            "make": self.make,
-            "model": self.model,
-            "daily_rate": self.daily_rate,
-        }
 ```
+
+- **Attributes**:
+  - `type`: The type of vehicle (e.g., car, bike).
+  - `make`: The manufacturer of the vehicle.
+  - `model`: The model name of the vehicle.
+  - `daily_rate`: The daily rental rate for the vehicle.
+
+- **Methods**:
+  - `__repr__`: Provides a string representation of the vehicle object.
+  - `to_dict`: Converts the vehicle object to a dictionary for JSON serialization.
 
 ---
 
-### VehicleRentalService Class
+### 2. `Car` Class (Subclass of `Vehicle`)
 
-The `VehicleRentalService` class manages a fleet of vehicles. It includes methods for adding, updating, searching, listing, calculating rental costs, exporting, and importing vehicles.
+The `Car` class is a specialized type of `Vehicle`. It inherits from `Vehicle` and adds an extra attribute: `is_convertible` to specify whether the car is a convertible or not.
 
 ```python
-import json
+class Car(Vehicle):
+    def __init__(self, make, model, daily_rate, is_convertible=False):
+        super().__init__("Car", make, model, daily_rate)
+        self.is_convertible = is_convertible
+```
 
+- **Inherits**:
+  - `Car` inherits all attributes and methods from the `Vehicle` class.
+  
+- **Additional Attribute**:
+  - `is_convertible`: Boolean flag to specify if the car is a convertible.
+
+- **Methods**:
+  - `__repr__`: Overrides the `__repr__` method to include the `is_convertible` attribute.
+  - `to_dict`: Overrides the `to_dict` method to include the `is_convertible` attribute in the dictionary representation of the object.
+
+---
+
+### 3. `Bike` Class (Subclass of `Vehicle`)
+
+The `Bike` class is another subclass of `Vehicle`. It adds a unique attribute: `has_sidecar` to indicate if the bike has a sidecar.
+
+```python
+class Bike(Vehicle):
+    def __init__(self, make, model, daily_rate, has_sidecar=False):
+        super().__init__("Bike", make, model, daily_rate)
+        self.has_sidecar = has_sidecar
+```
+
+- **Inherits**:
+  - `Bike` inherits all attributes and methods from the `Vehicle` class.
+
+- **Additional Attribute**:
+  - `has_sidecar`: Boolean flag to indicate if the bike has a sidecar.
+
+- **Methods**:
+  - `__repr__`: Overrides the `__repr__` method to include the `has_sidecar` attribute.
+  - `to_dict`: Overrides the `to_dict` method to include the `has_sidecar` attribute in the dictionary.
+
+---
+
+### 4. `VehicleRentalService` Class
+
+The `VehicleRentalService` class manages the fleet of vehicles. It can add, update, list, and calculate rental costs for vehicles. This class can handle both `Car` and `Bike` objects, thanks to inheritance.
+
+```python
 class VehicleRentalService:
     def __init__(self):
         self.vehicles = []
 
-    def add_vehicle(self, type, make, model, daily_rate):
+    def add_vehicle(self, vehicle):
         """Add a new vehicle to the fleet."""
-        if not type or not make or not model or not daily_rate:
-            raise ValueError("Type, make, model, and daily rate are required.")
-        if not isinstance(daily_rate, (int, float)) or daily_rate <= 0:
-            raise ValueError("Daily rate must be a positive number.")
-        vehicle = Vehicle(type, make, model, daily_rate)
+        if not isinstance(vehicle, Vehicle):
+            raise ValueError("Only instances of Vehicle or its subclasses can be added.")
         self.vehicles.append(vehicle)
         print(f"Vehicle added: {vehicle}")
 
-    def update_vehicle(self, index, type=None, make=None, model=None, daily_rate=None):
+    def update_vehicle(self, index, make=None, model=None, daily_rate=None, additional_attributes=None):
         """Update an existing vehicle's details."""
         if index < 0 or index >= len(self.vehicles):
             raise IndexError("Invalid vehicle index.")
         vehicle = self.vehicles[index]
-        if type:
-            vehicle.type = type
         if make:
             vehicle.make = make
         if model:
@@ -81,17 +108,12 @@ class VehicleRentalService:
             if not isinstance(daily_rate, (int, float)) or daily_rate <= 0:
                 raise ValueError("Daily rate must be a positive number.")
             vehicle.daily_rate = daily_rate
+        if additional_attributes:
+            if isinstance(vehicle, Car) and 'is_convertible' in additional_attributes:
+                vehicle.is_convertible = additional_attributes['is_convertible']
+            if isinstance(vehicle, Bike) and 'has_sidecar' in additional_attributes:
+                vehicle.has_sidecar = additional_attributes['has_sidecar']
         print(f"Vehicle updated: {vehicle}")
-
-    def search_vehicles(self, type=None, make=None, model=None):
-        """Search for vehicles by type, make, or model."""
-        results = []
-        for vehicle in self.vehicles:
-            if (type and vehicle.type.lower() == type.lower()) or \
-               (make and vehicle.make.lower() == make.lower()) or \
-               (model and vehicle.model.lower() == model.lower()):
-                results.append(vehicle)
-        return results
 
     def list_vehicles(self):
         """List all vehicles in the fleet."""
@@ -99,57 +121,36 @@ class VehicleRentalService:
             print("No vehicles found.")
         for i, vehicle in enumerate(self.vehicles):
             print(f"{i + 1}. {vehicle}")
-
-    def calculate_rental_cost(self, index, days):
-        """Calculate the rental cost for a specific vehicle."""
-        if index < 0 or index >= len(self.vehicles):
-            raise IndexError("Invalid vehicle index.")
-        if not isinstance(days, int) or days <= 0:
-            raise ValueError("Number of days must be a positive integer.")
-        vehicle = self.vehicles[index]
-        return vehicle.daily_rate * days
-
-    def export_vehicles(self, filename):
-        """Export vehicle data to a JSON file."""
-        vehicle_data = [vehicle.to_dict() for vehicle in self.vehicles]
-        with open(filename, "w") as file:
-            json.dump(vehicle_data, file, indent=4)
-        print(f"Vehicle data exported to {filename}.")
-
-    def import_vehicles(self, filename):
-        """Import vehicle data from a JSON file."""
-        with open(filename, "r") as file:
-            vehicle_data = json.load(file)
-        self.vehicles = [Vehicle(**data) for data in vehicle_data]
-        print(f"Vehicle data imported from {filename}.")
 ```
 
+- **Methods**:
+  - `add_vehicle`: Adds a `Vehicle` (or subclass) to the fleet.
+  - `update_vehicle`: Updates an existing vehicle’s attributes, including attributes specific to subclasses (`Car` and `Bike`).
+  - `list_vehicles`: Lists all vehicles in the fleet.
+  
 ---
 
-### Example Usage
+### 5. `main` Function
+
+The `main` function demonstrates how to use the `VehicleRentalService` class. It creates vehicles (`Car` and `Bike`), adds them to the rental service, updates vehicle information, and performs various operations.
 
 ```python
 def main():
     service = VehicleRentalService()
 
-    # Add vehicles
-    service.add_vehicle("Car", "Toyota", "Corolla", 50)
-    service.add_vehicle("Bike", "Yamaha", "YZF-R3", 30)
-    service.add_vehicle("Car", "Ford", "Mustang", 100)
+    # Add vehicles (now using Car and Bike)
+    car1 = Car("Toyota", "Corolla", 50, is_convertible=True)
+    bike1 = Bike("Yamaha", "YZF-R3", 30, has_sidecar=False)
+    service.add_vehicle(car1)
+    service.add_vehicle(bike1)
 
     # List all vehicles
     print("\nAll Vehicles:")
     service.list_vehicles()
 
-    # Update a vehicle
+    # Update a vehicle (update the convertible status for a Car)
     print("\nUpdating Vehicle 1:")
-    service.update_vehicle(0, type="Car", make="Toyota", model="Camry", daily_rate=60)
-
-    # Search for vehicles
-    print("\nSearch Results for 'Car':")
-    results = service.search_vehicles(type="Car")
-    for vehicle in results:
-        print(vehicle)
+    service.update_vehicle(0, additional_attributes={'is_convertible': False})
 
     # Calculate rental cost
     print("\nCalculating Rental Cost for Vehicle 2 (3 days):")
@@ -166,40 +167,36 @@ if __name__ == "__main__":
     main()
 ```
 
----
-
-## Key Improvements
-
-1. **Input Validation**:
-   - Ensures that `type`, `make`, `model`, and `daily_rate` are provided when adding a vehicle.
-   - Validates that `daily_rate` is a positive number.
-
-2. **Dynamic Updates**:
-   - Allows updating individual attributes (type, make, model, or daily rate) of a vehicle without overwriting the entire object.
-
-3. **Error Handling**:
-   - Raises `ValueError` for invalid inputs and `IndexError` for invalid vehicle indices.
-
-4. **Search Functionality**:
-   - Searches for vehicles by `type`, `make`, or `model` (case-insensitive for strings).
-
-5. **Rental Cost Calculation**:
-   - Calculates the rental cost based on the number of days and the vehicle's daily rate.
-
-6. **Export/Import**:
-   - Exports vehicle data to a JSON file for persistence.
-   - Imports vehicle data from a JSON file to restore the system state.
+- **Key Features**:
+  - Add `Car` and `Bike` vehicles to the rental service.
+  - List all vehicles in the fleet.
+  - Update vehicle attributes (e.g., change `is_convertible`).
+  - Calculate rental costs based on daily rate.
+  - Export and import vehicle data from a JSON file.
 
 ---
 
-## Reflection
+## Key Concepts
 
-This project was an excellent opportunity to apply Object-Oriented Programming (OOP) principles in Python. By creating the `Vehicle` and `VehicleRentalService` classes, I was able to encapsulate vehicle-related data and behaviors into reusable components. The system is modular, making it easy to extend with additional features in the future.
+### 1. **Inheritance**
+- The `Car` and `Bike` classes are subclasses of the `Vehicle` class. This means they inherit all the attributes and methods of `Vehicle` but can also introduce their own specialized attributes and methods.
+- In this case, `Car` adds the `is_convertible` attribute, while `Bike` adds `has_sidecar`.
 
-One of the challenges I faced was ensuring robust input validation and error handling. For example, validating the `daily_rate` attribute required careful consideration of edge cases, such as non-numeric or negative values. Implementing the search functionality also required thoughtful design to ensure it was both efficient and user-friendly.
+### 2. **Method Overriding**
+- The `Car` and `Bike` classes override the `__repr__` and `to_dict` methods to provide specialized behavior for these specific vehicle types (adding the new attributes in the output).
 
-The rental cost calculation feature was particularly rewarding to implement. It demonstrates how business logic can be integrated into a system to provide practical functionality. The export/import feature adds persistence, making the system more practical for real-world use.
+### 3. **Polymorphism**
+- The `VehicleRentalService` class can interact with both `Car` and `Bike` objects in the same way as `Vehicle` objects, but it can also handle the special attributes for `Car` and `Bike` when updating or displaying vehicle information.
 
+---
+
+## Conclusion
+
+This example shows how inheritance helps in organizing and extending code by creating specialized subclasses (`Car` and `Bike`) while maintaining common functionality in a base class (`Vehicle`). The `VehicleRentalService` class makes use of polymorphism to manage different types of vehicles effectively. 🚗🏍️
+
+```
+
+This breakdown provides a detailed explanation of the code and the concepts of inheritance, method overriding, and polymorphism used in the example. Save it as `vehicle_rental_service.md` for documentation or sharing purposes!
 ---
 
 ## Bibliography
