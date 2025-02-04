@@ -1,14 +1,24 @@
-
 # Special Methods (Magic/Dunder Methods)
+   - [Constructors and Destructors](#constructors-and-destructors)
+     - `__init__`
+     - `__del__`
+   - [String Representation](#string-representation)
+     - `__repr__`
+     - `__str__`
+   - [Container-Like Objects](#container-like-objects)
+     - `__len__`
+     - `__getitem__`
+   - [Comparators](#comparators)
+     - `__eq__`, `__lt__`, `__gt__`, etc.
 
-Special methods, also known as **magic methods** or **dunder methods** (double underscore methods), are predefined methods in Python that allow you to define how objects of a class behave in specific situations. They are automatically invoked by Python in response to certain operations.
+Special methods, also known as **magic methods** or **dunder methods** (double underscore methods), are predefined methods in Python that allow you to define how objects of a class behave in specific situations. These methods are automatically invoked by Python in response to certain operations. Understanding these methods is crucial for building classes that can be used seamlessly with Python's built-in syntax and operators.
 
 ---
 
-## **1. Constructors and Destructors**
+## **Constructors and Destructors**
 
 ### **`__init__` (Constructor)**
-The `__init__` method is called when an object is created. It is used to initialize the object's attributes.
+The `__init__` method is a special method used to initialize the attributes of an object when it is created. It acts as a constructor, where you define the properties or state of the object.
 
 #### Example:
 ```python
@@ -26,7 +36,7 @@ print(my_car.make)  # Output: Toyota
 ---
 
 ### **`__del__` (Destructor)**
-The `__del__` method is called when an object is about to be destroyed. It is used for cleanup operations, such as closing files or releasing resources.
+The `__del__` method is called when an object is about to be destroyed. It is used for cleanup operations, such as closing files or releasing resources that are no longer needed.
 
 #### Example:
 ```python
@@ -47,10 +57,10 @@ file_manager.file.write("Hello, World!")
 
 ---
 
-## **2. String Representation**
+## **String Representation**
 
 ### **`__repr__`**
-The `__repr__` method returns an official string representation of an object, primarily used for debugging and development. It should include detailed information about the object's state.
+The `__repr__` method returns an official string representation of an object, primarily used for debugging and development. It should ideally provide a detailed and unambiguous string representation of the object that can be used to recreate the object using `eval()`.
 
 #### Example:
 ```python
@@ -70,7 +80,7 @@ print(repr(student))  # Output: Student(name='Alice', id='A123')
 ---
 
 ### **`__str__`**
-The `__str__` method returns a user-friendly string representation of an object. It is called by the `print()` function and `str()`.
+The `__str__` method returns a user-friendly string representation of an object. This is what gets printed when you use the `print()` function or `str()` to convert the object to a string.
 
 #### Example:
 ```python
@@ -89,10 +99,10 @@ print(student)  # Output: Student Name: Bob, ID: B456
 
 ---
 
-## **3. Container-Like Objects**
+## **Container-Like Objects**
 
 ### **`__len__`**
-The `__len__` method returns the length of the container. It is called by the `len()` function.
+The `__len__` method defines how Python's built-in `len()` function should behave for custom container objects. It is used to return the length of the container, such as a list or dictionary.
 
 #### Example:
 ```python
@@ -117,7 +127,7 @@ print(len(my_list))  # Output: 2
 ---
 
 ### **`__getitem__`**
-The `__getitem__` method allows indexing into the container. It is called when you use square brackets (`[]`) to access an item.
+The `__getitem__` method allows indexing into the container using square brackets (`[]`). It is called when you access an element of the container by index.
 
 #### Example:
 ```python
@@ -141,10 +151,12 @@ print(my_list[0])  # Output: 10
 
 ---
 
-## **4. Comparators**
+## **Comparators**
+
+Comparators allow you to define how objects of your class behave when compared using standard comparison operators (like `==`, `<`, `>`, etc.). These methods allow you to use your custom objects with Python’s comparison operators, enabling comparisons based on attributes of the objects.
 
 ### **`__eq__` (Equality)**
-The `__eq__` method defines the behavior of the `==` operator.
+The `__eq__` method defines the behavior of the `==` operator. It is invoked when two objects are compared for equality.
 
 #### Example:
 ```python
@@ -166,7 +178,7 @@ print(student1 == student2)  # Output: True
 ---
 
 ### **`__lt__` (Less Than)**
-The `__lt__` method defines the behavior of the `<` operator.
+The `__lt__` method defines the behavior of the `<` operator. It is invoked when one object is compared to another with the less-than operator.
 
 #### Example:
 ```python
@@ -188,7 +200,7 @@ print(student1 < student2)  # Output: True
 ---
 
 ### **`__gt__` (Greater Than)**
-The `__gt__` method defines the behavior of the `>` operator.
+The `__gt__` method defines the behavior of the `>` operator. It is invoked when one object is compared to another with the greater-than operator.
 
 #### Example:
 ```python
@@ -209,12 +221,60 @@ print(student1 > student2)  # Output: False
 
 ---
 
+### **`__le__` (Less Than or Equal to)**
+The `__le__` method defines the behavior of the `<=` operator. It is invoked when an object is compared to another using the less-than-or-equal-to operator.
+
+#### Example:
+```python
+class Student:
+    def __init__(self, name, grade):
+        self.name = name
+        self.grade = grade
+
+    def __le__(self, other):
+        return self.grade <= other.grade
+
+# Creating objects
+student1 = Student("Alice", 85)
+student2 = Student("Bob", 90)
+
+print(student1 <= student2)  # Output: True
+```
+
+---
+
+### **`__ge__` (Greater Than or Equal to)**
+The `__ge__` method defines the behavior of the `>=` operator. It is invoked when an object is compared to another using the greater-than-or-equal-to operator.
+
+#### Example:
+```python
+class Student:
+    def __init__(self, name, grade):
+        self.name = name
+        self.grade = grade
+
+    def __ge__(self, other):
+        return self.grade >= other.grade
+
+# Creating objects
+student1 = Student("Alice", 85)
+student2 = Student("Bob", 90)
+
+print(student1 >= student2)  # Output: False
+```
+
+---
+
 ### **Common Comparator Methods**
+Here is a quick reference for the comparison operators and their corresponding special methods:
 - `x == y` → `__eq__(self, other)`
 - `x != y` → `__ne__(self, other)`
 - `x < y` → `__lt__(self, other)`
 - `x <= y` → `__le__(self, other)`
 - `x > y` → `__gt__(self, other)`
 - `x >= y` → `__ge__(self, other)`
+
+By implementing these methods in your classes, you can create objects that behave naturally with Python's comparison operators. This is essential for building intuitive and consistent object models.
+
 
 ---
