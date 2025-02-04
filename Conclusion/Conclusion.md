@@ -73,7 +73,7 @@ This guide has provided a comprehensive overview of **Object-Oriented Programmin
 ---
 
 ### Classes III: Special Methods
-- **File**: [`classes_III_special_methods.py`](Classes-III:-Special-Methods.py)
+- **File**: [`classes_III_special_methods.py`](classes-III:-Special-Methods.py)
 - **Topics Covered**:
   - Special methods (`__init__`, `__repr__`, `__str__`, `__len__`, etc.).
   - Making objects behave like containers or support comparisons.
